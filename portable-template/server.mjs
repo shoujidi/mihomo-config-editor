@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process'
 import { createServer } from 'node:http'
 import { readFile } from 'node:fs/promises'
 import { extname, resolve, sep } from 'node:path'
@@ -30,4 +31,16 @@ const server = createServer(async (request, response) => {
   } catch { response.writeHead(404).end() }
 })
 server.on('error', (error) => { console.error(error.message); process.exitCode = 1 })
-server.listen(port, host)
+server.listen(port, host, () => {
+  const address = `http://${host}:${port}/`
+  console.log(`机场配置修改工具：${address}`)
+  console.log('保持此命令窗口打开；关闭此窗口即停止编辑器。')
+  if (process.env.MIHOMO_PORTABLE_OPEN_BROWSER !== '1' || process.platform !== 'win32') return
+  const powershell = resolve(process.env.SystemRoot || 'C:\\Windows', 'System32/WindowsPowerShell/v1.0/powershell.exe')
+  const child = spawn(powershell, ['-NoProfile', '-NonInteractive', '-Command', `Start-Process -FilePath '${address}' -ErrorAction Stop`], {
+    windowsHide: true, detached: true, stdio: 'ignore',
+  })
+  child.on('error', () => console.warn(`无法启动默认浏览器，请手动打开 ${address}`))
+  child.on('exit', (code) => { if (code) console.warn(`无法启动默认浏览器，请手动打开 ${address}`) })
+  child.unref()
+})

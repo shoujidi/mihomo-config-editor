@@ -1,5 +1,6 @@
 @echo off
 setlocal
+title Mihomo Config Editor
 if not exist "%~dp0tools\start.ps1" goto incomplete
 if not exist "%~dp0runtime\node.exe" goto incomplete
 if not exist "%~dp0dist\index.html" goto incomplete
