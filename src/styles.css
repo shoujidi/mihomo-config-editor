@@ -626,3 +626,19 @@ footer a { display: flex; align-items: center; gap: 6px; }
   .group-manager-layout { grid-template-columns: 1fr; }.group-card-list { max-height: 190px; }.group-reference-panel { min-height: 420px; }.group-reference-heading > div { flex-basis: 100%; }.rename-group-button, .delete-group-button, .apply-preview-button { flex: 1; justify-content: center; }.group-reference-list { max-height: 390px; }
   .group-reference-list.columns-2, .group-reference-list.columns-3 { grid-template-columns: 1fr; }.reference-view-switch { order: 2; }.reference-batchbar > b { flex: 1; }.selected-sort-select { margin-left: auto; }.reference-batchbar .sort-selected-button { margin-left: 0; }
 }
+
+.refresh-dialog { width: min(900px, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); padding: 1.25rem; border: 1px solid #a9b7c9; border-radius: 1rem; color: #172334; background: #f8fbff; }
+.refresh-dialog::backdrop { background: rgb(12 22 40 / .55); }
+.refresh-dialog header, .refresh-dialog footer, .refresh-toolbar { display: flex; gap: .75rem; align-items: center; flex-wrap: wrap; }
+.refresh-dialog header, .refresh-dialog footer { justify-content: space-between; }
+.refresh-dialog h2, .refresh-dialog header p { margin: 0; }
+.refresh-dialog label { display: inline-flex; align-items: center; gap: .35rem; }
+.refresh-toolbar { margin: .8rem 0; }
+.refresh-results { max-height: min(48vh, 34rem); overflow: auto; border: 1px solid #c7d3e2; border-radius: .6rem; }
+.refresh-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; padding: .55rem; gap: .5rem; }
+.refresh-row + .refresh-row { border-top: 1px solid #dce4ee; }
+.refresh-row label { min-width: 0; overflow-wrap: anywhere; }
+.refresh-row select { min-width: 0; width: 100%; }
+.refresh-dialog footer { margin-top: .8rem; }
+.refresh-dialog footer span { margin-right: auto; }
+@media (max-width: 650px) { .refresh-row { grid-template-columns: 1fr; } }

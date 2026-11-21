@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import NodeManager, { type SelectionMode } from './NodeManager'
 import GroupManager from './GroupManager'
+import RefreshDialog from './RefreshDialog'
 import { copyProxyNodes, parseConfig, type CopyConflictStrategy, type ParsedConfig, type ProxyNode } from './core'
 
 type ConfigEditorProps = {
@@ -48,6 +49,7 @@ function parseDocumentSource(source: string): ParsedDocument {
 export default function ConfigEditor({ onFlash, incoming, onSendToBuilder, onShareYaml }: ConfigEditorProps) {
   const [documents, setDocuments] = useState<ConfigDocument[]>([])
   const [activeId, setActiveId] = useState('')
+  const [refreshId, setRefreshId] = useState('')
   const [showSource, setShowSource] = useState(false)
   const [workspace, setWorkspace] = useState<'nodes' | 'groups'>('nodes')
   const [focusMode, setFocusMode] = useState(false)
@@ -363,9 +365,10 @@ export default function ConfigEditor({ onFlash, incoming, onSendToBuilder, onSha
       </section> : active && <section className="standalone-editor-shell">
         <div className="editor-filebar"><span className="editor-file-icon"><FileCode2 size={19} /></span><div><strong>{active.filename}</strong><small>{parsed.error ? '配置存在语法错误' : `${parsed.data?.proxies.length ?? 0} 个节点 · ${parsed.data?.groups.length ?? 0} 个策略组`}</small></div>
           {!parsed.error && <div className="editor-workspace-tabs compact" role="tablist" aria-label="配置编辑工作区"><button type="button" role="tab" aria-selected={workspace === 'nodes'} className={workspace === 'nodes' ? 'active' : ''} onClick={() => setWorkspace('nodes')}>节点管理 <span>{parsed.data?.proxies.length ?? 0}</span></button><button type="button" role="tab" aria-selected={workspace === 'groups'} className={workspace === 'groups' ? 'active' : ''} onClick={() => setWorkspace('groups')}>节点组管理 <span>{parsed.data?.groups.length ?? 0}</span></button></div>}
-          <div className="editor-history-actions"><button type="button" disabled={active.historyIndex <= 0} onClick={() => travelHistory(active, active.historyIndex - 1)} title="撤销"><Undo2 size={15} /></button><button type="button" disabled={active.historyIndex >= active.history.length - 1} onClick={() => travelHistory(active, active.historyIndex + 1)} title="恢复"><Redo2 size={15} /></button></div>
+          {!parsed.error && !!parsed.data?.proxies.length && <button type="button" className="editor-file-action" onClick={() => setRefreshId(active.id)}><RotateCcw size={15} />离线刷新</button>}<div className="editor-history-actions"><button type="button" disabled={active.historyIndex <= 0} onClick={() => travelHistory(active, active.historyIndex - 1)} title="撤销"><Undo2 size={15} /></button><button type="button" disabled={active.historyIndex >= active.history.length - 1} onClick={() => travelHistory(active, active.historyIndex + 1)} title="恢复"><Redo2 size={15} /></button></div>
           <button type="button" className="editor-file-action" onClick={() => setShowSource(!showSource)}><History size={15} />{showSource ? '收起源码' : '查看源码'}</button><button type="button" className="editor-file-action" disabled={documents.length >= 2} onClick={() => fileInput.current?.click()}><FilePlus2 size={15} />添加配置</button><button type="button" className="editor-file-action focus-toggle" onClick={() => setFocusMode(!focusMode)}>{focusMode ? <Minimize2 size={15} /> : <Maximize2 size={15} />}{focusMode ? '退出全屏' : '全屏编辑'}</button><button type="button" className="editor-file-action" onClick={() => closeDocument(active.id)}><RotateCcw size={15} />关闭</button>
         </div>
+        {refreshId === active.id && parsed.data && <RefreshDialog key={active.id} filename={active.filename} source={active.source} nodes={parsed.data.proxies} onClose={() => setRefreshId('')} onApply={(source, count) => { commitSource(active.id, source, `已离线刷新 ${count} 个节点`); setRefreshId('') }} />}
         {parsed.error && <div className="editor-parse-error"><CircleAlert size={16} />{parsed.error}</div>}{showSource && <div className="standalone-source"><div><span>YAML 源码预览</span><small>节点内容只读，修改请使用卡片操作</small></div><textarea value={active.source} readOnly spellCheck={false} /></div>}
         {!parsed.error && (workspace === 'nodes' ? <NodeManager configId={active.id} source={active.source} nodes={parsed.data?.proxies ?? []} selected={active.selected} mode={active.mode} onModeChange={(nextMode) => updateMode(active.id, nextMode)} onSelectionChange={(selected) => updateSelection(active.id, selected)} onSourceChange={(source, message) => commitSource(active.id, source, message)} /> : <GroupManager source={active.source} nodes={parsed.data?.proxies ?? []} groups={parsed.data?.groups ?? []} onSourceChange={(source, message) => commitSource(active.id, source, message)} />)}
         <div className="editor-exportbar"><span><ShieldCheck size={15} /> 当前文件的所有修改均在本地完成</span><button type="button" className="handoff-button" onClick={() => onSendToBuilder(active.source, active.filename)}><ArrowRightLeft size={15} />转到出口生成</button><button type="button" onClick={copyYaml}><Clipboard size={15} />复制 YAML</button><button type="button" disabled={!!parsed.error} onClick={() => onShareYaml(active.source, editedFilename)}><QrCode size={16} />二维码</button><button type="button" className="primary" disabled={!!parsed.error} onClick={downloadYaml}><Download size={16} />下载 YAML</button></div>
