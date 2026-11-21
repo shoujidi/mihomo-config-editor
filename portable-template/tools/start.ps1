@@ -1,5 +1,5 @@
-[CmdletBinding()]
-param()
+﻿[CmdletBinding()]
+param([switch]$NoBrowser)
 
 $ErrorActionPreference = 'Stop'
 $portableRoot = Split-Path -Parent $PSScriptRoot
@@ -10,13 +10,13 @@ $dataDirectory = Join-Path $portableRoot 'data'
 $statePath = Join-Path $dataDirectory 'editor-state.json'
 
 function Open-Editor([int]$editorPort) {
-  Start-Process -FilePath "http://127.0.0.1:$editorPort/"
+  if (-not $NoBrowser) { Start-Process -FilePath "http://127.0.0.1:$editorPort/" }
 }
 
 function Test-Editor([int]$editorPort) {
   try {
-    $response = Invoke-WebRequest -Uri "http://127.0.0.1:$editorPort/api/share-info" -UseBasicParsing -TimeoutSec 1
-    return $response.StatusCode -eq 200
+    $response = Invoke-WebRequest -Uri "http://127.0.0.1:$editorPort/api/portable-ready" -UseBasicParsing -TimeoutSec 1
+    return ($response.StatusCode -eq 200) -and (($response.Content | ConvertFrom-Json).offline -eq $true)
   } catch {
     return $false
   }

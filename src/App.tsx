@@ -330,7 +330,7 @@ function App() {
             <button type="button" className={view === 'builder' ? 'active' : ''} onClick={() => setView('builder')}>出口生成</button>
             <button type="button" className={view === 'editor' ? 'active' : ''} onClick={() => setView('editor')}>配置编辑</button>
           </div>
-          <button type="button" className="qr-nav-button" onClick={() => { setShowQrShare(true); setShareError('') }}><QrCode size={15} /> 二维码传文件</button>
+          {import.meta.env.VITE_LOOPBACK_PORTABLE !== '1' && <button type="button" className="qr-nav-button" onClick={() => { setShowQrShare(true); setShareError('') }}><QrCode size={15} /> 二维码传文件</button>}
           <a href="https://wiki.metacubex.one/en/config/proxies/dialer-proxy/" target="_blank" rel="noreferrer">语法文档 <ArrowRight size={14} /></a>
           <span className="privacy"><ShieldCheck size={15} /> 文件仅在本地处理</span>
         </nav>
@@ -479,7 +479,7 @@ function App() {
                 <div><h2>配置已生成</h2><p>新增 {generatedNames.length} 个出口节点，原配置结构与注释已保留</p></div>
                 <div className="output-actions">
                   <button className="secondary-button" onClick={copyOutput}><Clipboard size={16} /> 复制</button>
-                  <button className="secondary-button" onClick={shareGeneratedYaml}><QrCode size={16} /> 二维码</button>
+                  {import.meta.env.VITE_LOOPBACK_PORTABLE !== '1' && <button className="secondary-button" onClick={shareGeneratedYaml}><QrCode size={16} /> 二维码</button>}
                   <button className="secondary-button handoff-inline" onClick={() => { const stem = filename.replace(/\.ya?ml$/i, '') || 'config'; sendToEditor(output, `${stem}-出口.yaml`) }}><ArrowRightLeft size={16} /> 继续编辑</button>
                   <button className="download-button" onClick={downloadOutput}><Download size={16} /> 下载 YAML</button>
                 </div>

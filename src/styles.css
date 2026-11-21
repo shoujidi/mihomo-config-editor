@@ -638,6 +638,8 @@ footer a { display: flex; align-items: center; gap: 6px; }
 .refresh-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; padding: .55rem; gap: .5rem; }
 .refresh-row + .refresh-row { border-top: 1px solid #dce4ee; }
 .refresh-row label { min-width: 0; overflow-wrap: anywhere; }
+.refresh-source-choice { min-width: 0; display: grid; gap: .35rem; }
+.refresh-source-choice button { overflow-wrap: anywhere; }
 .refresh-row select { min-width: 0; width: 100%; }
 .refresh-dialog footer { margin-top: .8rem; }
 .refresh-dialog footer span { margin-right: auto; }

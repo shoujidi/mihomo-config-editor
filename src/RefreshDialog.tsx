@@ -86,14 +86,14 @@ export default function RefreshDialog({ filename, source, nodes, onClose, onAppl
             const checked = event.target.checked
             setSelected((old) => { const next = new Set(old); if (checked) next.add(node.name); else next.delete(node.name); return next })
           }} /> {node.name} <small>{node.type}</small></label>
-          {blocked ? <small>目标节点重名，不能安全刷新</small> : <label>来源 <select aria-label={`${node.name} 的来源`} value={choice ?? ''} onFocus={() => setManualTarget(node.name)} onChange={(event) => {
+          {blocked ? <small>目标节点重名，不能安全刷新</small> : <div className="refresh-source-choice"><button type="button" onClick={() => setManualTarget(node.name)} aria-expanded={manualTarget === node.name}>{current ? current.file + ' · ' + current.node.name : ambiguous ? '多个来源同名，请指定' : '手动指定来源'}</button>{manualTarget === node.name && <label>来源 <select aria-label={`${node.name} 的来源`} value={choice ?? ''} onFocus={() => setManualTarget(node.name)} onChange={(event) => {
             const id = event.target.value
             setAssignments((old) => new Map(old).set(node.name, id))
             if (!id) setSelected((old) => { const next = new Set(old); next.delete(node.name); return next })
           }}><option value="">{ambiguous ? '多个来源同名，请选择' : '不更新／手动选择'}</option>
             {menu.map((item) =>
               <option key={item.id} value={item.id}>{item.file} · {item.node.name}（{item.id}）</option>)}
-          </select></label>}
+          </select></label>}</div>}
         </div>
       })}
     </div></>}
