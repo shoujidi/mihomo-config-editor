@@ -1,12 +1,14 @@
 @echo off
-chcp 65001 >nul
 setlocal
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0tools\stop.ps1"
-if errorlevel 1 (
-  echo.
-  echo 停止程序时发生错误。
-  pause
-) else (
-  timeout /t 2 /nobreak >nul
-)
-
+if not exist "%~dp0tools\stop.ps1" goto incomplete
+"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0tools\stop.ps1"
+set "result=%ERRORLEVEL%"
+if "%result%"=="0" exit /b 0
+echo(
+echo Stop failed. Review the error above.
+pause
+exit /b %result%
+:incomplete
+echo Portable files are missing. Extract the entire ZIP first.
+pause
+exit /b 2

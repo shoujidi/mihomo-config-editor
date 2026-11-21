@@ -10,7 +10,10 @@ $dataDirectory = Join-Path $portableRoot 'data'
 $statePath = Join-Path $dataDirectory 'editor-state.json'
 
 function Open-Editor([int]$editorPort) {
-  if (-not $NoBrowser) { Start-Process -FilePath "http://127.0.0.1:$editorPort/" }
+  if ($NoBrowser) { return }
+  $address = "http://127.0.0.1:$editorPort/"
+  try { Start-Process -FilePath $address -ErrorAction Stop }
+  catch { Write-Warning "无法打开默认浏览器，请手动打开 $address" }
 }
 
 function Test-Editor([int]$editorPort) {
